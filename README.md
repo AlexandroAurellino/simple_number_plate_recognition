@@ -31,7 +31,7 @@ pip install -r requirements.txt
 To run the project, use the following command:
 
 ```bash
-python anpr.py
+python app.py
 ```
 
 Make sure to place your images in the plat_nomor_dataset folder.

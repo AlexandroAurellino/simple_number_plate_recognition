@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Plate Recognition Result</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mt-5">Recognition Result</h1>
+
+        <!-- Display the recognized text -->
+        <div class="text-center mt-4">
+            <h2>Recognized Text: {{ text }}</h2>
+        </div>
+
+        <!-- Display the processed license plate image -->
+        {% if image_data %}
+        <div class="text-center mt-4">
+            <img src="data:image/jpeg;base64,{{ image_data }}" class="img-fluid mt-3" alt="Processed Image">
+        </div>
+        {% else %}
+        <div class="text-center mt-4">
+            <h2>No image data available.</h2>
+        </div>
+        {% endif %}
+
+        <!-- Back button -->
+        <div class="text-center mt-3">
+            <a href="/" class="btn btn-primary">Go Back</a>
+        </div>
+    </div>
+</body>
+</html>
