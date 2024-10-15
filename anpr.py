@@ -154,13 +154,21 @@ def recognize_license_plate(file_path):
     return None
 
 if __name__ == "__main__":
+    # Get the current directory of the script
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    dataset_path = os.path.join(current_dir, "..", "plat_nomor_dataset")
-    file_name = "AB3226FR.jpg"  # Using the file name from your last run
+    
+    # Instead of going up a directory, construct the relative path correctly
+    dataset_path = os.path.join(current_dir, "plat_nomor_dataset")  # No need for ".." if it's in the same structure
+    
+    file_name = "AB3226FR.jpg"
     file_path = os.path.join(dataset_path, file_name)
     
+    # Print for debugging
     print(f"Attempting to process image: {file_path}")
+    
+    # Call the function
     recognized_text = recognize_license_plate(file_path)
+    
     if recognized_text:
         print(f"Recognized license plate: {recognized_text}")
     else:
