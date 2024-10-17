@@ -31,31 +31,35 @@ def recognize_license_plate(image_path):
     if img is None:
         print("Error loading image")
         return None, None
-    # Preprocessing steps
-    print("Preprocessing image...")
-    # Preprocess image: grayscale, blur, edge detection, etc.
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    print("Image converted to grayscale")
-    filtered = cv2.bilateralFilter(gray, 11, 17, 17)
-    print("Image bilateral filtered")
-    edged = cv2.Canny(filtered, 30, 200)
-    print("Image edges detected")
-    
-    # Find contours
-    contours = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    contours = imutils.grab_contours(contours)
-    contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
-    
-    location = None
-    for contour in contours:
-        approx = cv2.approxPolyDP(contour, 10, True)
-        if len(approx) == 4:
-            location = approx
-            break
 
-    # Create mask and crop the license plate
-    mask = np.zeros(gray.shape, dtype=np.uint8)
-    if location is not None:
+    # Preprocessing steps
+    try:
+        print("Preprocessing image...")
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        print("Image converted to grayscale")
+        filtered = cv2.bilateralFilter(gray, 11, 17, 17)
+        print("Image bilateral filtered")
+        edged = cv2.Canny(filtered, 30, 200)
+        print("Image edges detected")
+
+        # Find contours
+        contours = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours = imutils.grab_contours(contours)
+        contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
+
+        location = None
+        for contour in contours:
+            approx = cv2.approxPolyDP(contour, 10, True)
+            if len(approx) == 4:
+                location = approx
+                break
+
+        if location is None:
+            print("No license plate contour found")
+            return None, None
+
+        # Create mask and crop the license plate
+        mask = np.zeros(gray.shape, dtype=np.uint8)
         cv2.drawContours(mask, [location], 0, 255, -1)
         masked_img = cv2.bitwise_and(img, img, mask=mask)
 
@@ -73,6 +77,11 @@ def recognize_license_plate(image_path):
         else:
             return None, None
 
+    except Exception as e:
+        print(f"Error in processing: {e}")
+        return None, None
+
+
 # Convert image to base64 for displaying on the webpage
 def image_to_base64(img):
     _, buffer = cv2.imencode('.jpg', img)
@@ -85,12 +94,10 @@ def image_to_base64(img):
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        # Check if a file is uploaded
         if 'file' not in request.files:
             return redirect(request.url)
         file = request.files['file']
 
-        # Ensure the file is allowed
         if file.filename == '' or not allowed_file(file.filename):
             return redirect(request.url)
 
@@ -98,10 +105,9 @@ def index():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
-        # Process the image and get the result
         text, processed_image = recognize_license_plate(file_path)
 
-        if text is not None:
+        if text is not None and processed_image is not None:
             print(f"Recognized Text: {text}")
             processed_img_data = image_to_base64(processed_image)
             return render_template('result.html', text=text, image_data=processed_img_data)
@@ -110,6 +116,7 @@ def index():
             return "License plate could not be recognized.", 400
 
     return render_template('index.html')
+
 
 # Serve uploaded files
 @app.route('/uploads/<filename>')
