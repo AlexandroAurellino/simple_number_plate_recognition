@@ -1,12 +1,11 @@
-import os
 import cv2
 import numpy as np
 import imutils
 import easyocr
 import streamlit as st
 from PIL import Image
-import io
 import base64
+import os
 
 # Function to check if the file has an allowed extension
 def allowed_file(filename):
@@ -59,6 +58,12 @@ def cv2_to_base64(img):
     _, buffer = cv2.imencode('.png', img)
     return base64.b64encode(buffer).decode('utf-8')
 
+# Load dummy image from a local relative path
+def load_dummy_image():
+    # Assuming the dummy image is located in a subdirectory named 'plat_nomor_dataset'
+    dummy_path = os.path.join("plat_nomor_dataset", "AB3226FR.jpg")
+    return Image.open(dummy_path)
+
 # Streamlit app
 def main():
     st.title("License Plate Recognition App")
@@ -72,51 +77,96 @@ def main():
     lower_threshold = st.sidebar.slider("Canny Edge: Lower Threshold", 0, 255, 10)
     upper_threshold = st.sidebar.slider("Canny Edge: Upper Threshold", 0, 255, 100)
 
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+    # Option to use dummy image
+    use_dummy = st.checkbox("Use Dummy Example Image")
 
-    if uploaded_file is not None:
-        if allowed_file(uploaded_file.name):
-            image = Image.open(uploaded_file)
-            st.image(image, caption='Uploaded Image', use_column_width=True)
+    if use_dummy:
+        image = load_dummy_image()
+        st.image(image, caption='Dummy License Plate Example', use_column_width=True)
 
-            if st.button('Recognize License Plate'):
-                text, filtered, edged, masked_img, cropped = recognize_license_plate(
-                    image, d, sigma_color, sigma_space, lower_threshold, upper_threshold
-                )
+        if st.button('Recognize License Plate'):
+            text, filtered, edged, masked_img, cropped = recognize_license_plate(
+                image, d, sigma_color, sigma_space, lower_threshold, upper_threshold
+            )
 
-                if text is not None:
-                    st.success(f"Recognized Text: {text}")
-                    
-                    # Display intermediate steps using columns
-                    col1, col2, col3, col4 = st.columns(4)
-                    
-                    with col1:
-                        st.subheader("Bilateral Filter")
-                        st.image(filtered, caption='Bilateral Filter', use_column_width=True)
-                    
-                    with col2:
-                        st.subheader("Edge Detection")
-                        st.image(edged, caption='Edge Detection', use_column_width=True)
-                    
-                    with col3:
-                        st.subheader("Masked Image")
-                        st.image(masked_img, caption='Masked Image', use_column_width=True)
-                    
-                    with col4:
-                        st.subheader("Cropped License Plate")
-                        st.image(cropped, caption='Cropped License Plate', use_column_width=True)
-                else:
-                    st.error("License plate could not be recognized.")
-                    # Display intermediate steps even if recognition fails
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.subheader("Bilateral Filter")
-                        st.image(filtered, caption='Bilateral Filter', use_column_width=True)
-                    with col2:
-                        st.subheader("Edge Detection")
-                        st.image(edged, caption='Edge Detection', use_column_width=True)
-        else:
-            st.error("Invalid file type. Please upload a JPG, JPEG, or PNG image.")
+            if text is not None:
+                st.success(f"Recognized Text: {text}")
+                
+                # Display intermediate steps using columns
+                col1, col2, col3, col4 = st.columns(4)
+                
+                with col1:
+                    st.subheader("Bilateral Filter")
+                    st.image(filtered, caption='Bilateral Filter', use_column_width=True)
+                
+                with col2:
+                    st.subheader("Edge Detection")
+                    st.image(edged, caption='Edge Detection', use_column_width=True)
+                
+                with col3:
+                    st.subheader("Masked Image")
+                    st.image(masked_img, caption='Masked Image', use_column_width=True)
+                
+                with col4:
+                    st.subheader("Cropped License Plate")
+                    st.image(cropped, caption='Cropped License Plate', use_column_width=True)
+            else:
+                st.error("License plate could not be recognized.")
+                # Display intermediate steps even if recognition fails
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.subheader("Bilateral Filter")
+                    st.image(filtered, caption='Bilateral Filter', use_column_width=True)
+                with col2:
+                    st.subheader("Edge Detection")
+                    st.image(edged, caption='Edge Detection', use_column_width=True)
+    
+    else:
+        uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+
+        if uploaded_file is not None:
+            if allowed_file(uploaded_file.name):
+                image = Image.open(uploaded_file)
+                st.image(image, caption='Uploaded Image', use_column_width=True)
+
+                if st.button('Recognize License Plate'):
+                    text, filtered, edged, masked_img, cropped = recognize_license_plate(
+                        image, d, sigma_color, sigma_space, lower_threshold, upper_threshold
+                    )
+
+                    if text is not None:
+                        st.success(f"Recognized Text: {text}")
+                        
+                        # Display intermediate steps using columns
+                        col1, col2, col3, col4 = st.columns(4)
+                        
+                        with col1:
+                            st.subheader("Bilateral Filter")
+                            st.image(filtered, caption='Bilateral Filter', use_column_width=True)
+                        
+                        with col2:
+                            st.subheader("Edge Detection")
+                            st.image(edged, caption='Edge Detection', use_column_width=True)
+                        
+                        with col3:
+                            st.subheader("Masked Image")
+                            st.image(masked_img, caption='Masked Image', use_column_width=True)
+                        
+                        with col4:
+                            st.subheader("Cropped License Plate")
+                            st.image(cropped, caption='Cropped License Plate', use_column_width=True)
+                    else:
+                        st.error("License plate could not be recognized.")
+                        # Display intermediate steps even if recognition fails
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.subheader("Bilateral Filter")
+                            st.image(filtered, caption='Bilateral Filter', use_column_width=True)
+                        with col2:
+                            st.subheader("Edge Detection")
+                            st.image(edged, caption='Edge Detection', use_column_width=True)
+            else:
+                st.error("Invalid file type. Please upload a JPG, JPEG, or PNG image.")
 
 if __name__ == "__main__":
     main()
