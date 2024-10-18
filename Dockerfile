@@ -9,6 +9,10 @@ ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV PIP_ROOT_USER_ACTION=ignore
 
+ENV FLASK_APP=app.py          
+ENV FLASK_RUN_HOST=0.0.0.0    
+ENV FLASK_ENV=development     
+
 # Install Python 3.10 and dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -27,7 +31,8 @@ RUN pip install --upgrade pip
 WORKDIR /workspace
 
 # Copy your Python script and requirements file
-COPY . /workspace/
+# COPY . /workspace/
+COPY requirements.txt /workspace
 
 # Install Python dependencies
 RUN pip install -r requirements.txt
@@ -35,8 +40,8 @@ RUN pip install -r requirements.txt
 # Tensorflow recommended approach
 # RUN python -m pip install tensorflow[and-cuda]
 
-# Verify Python installations
-RUN python --version
+# Expose the port Flask will run on
+EXPOSE 5000
 
-# Set the default command to run the Python script
-CMD ["python", "app.py"]
+# Command to run the Flask application with reloading
+CMD ["flask", "run", "--reload"]

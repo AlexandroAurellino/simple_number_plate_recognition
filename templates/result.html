@@ -5,6 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>License Plate Recognition Result</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Roboto', sans-serif;
+        }
+        h1, h2 {
+            color: #4a4a4a;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+        .btn-primary {
+            background-color: #5a738e;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #4a6275;
+        }
+        .img-fluid {
+            max-width: 400px;
+            border: 1px solid #d1d1d1;
+            border-radius: 10px;
+        }
+        .text-muted {
+            color: #6c757d;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -12,7 +43,7 @@
 
         <!-- Display the recognized text -->
         <div class="text-center mt-4">
-            <h2>Recognized Text: {{ text }}</h2>
+            <h2>Recognized Text: <span class="text-muted">{{ text }}</span></h2>
         </div>
 
         <!-- Display the processed license plate image -->
